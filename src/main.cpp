@@ -9,10 +9,16 @@
 #include <QtCore/QSettings>
 #include <src/view/PlatformSelection.h>
 
-void writeToRegistry() {
+GamePlatform getPlatform() {
     QSettings settings("Leogout", "Gorn Mods Installer");
-    settings.setValue("platform", "aaa");
-    std::cout << settings.value("zdzdz").toString().isNull();
+
+    // If platform undefined in registry, returns GamePlatform::None
+    return (GamePlatform) settings.value("platform", GamePlatform::None).toInt();
+}
+
+void savePlatform(GamePlatform platform) {
+    QSettings settings("Leogout", "Gorn Mods Installer");
+    settings.setValue("platform", platform);
 }
 
 int main(int argc, char *argv[]) {
@@ -23,36 +29,26 @@ int main(int argc, char *argv[]) {
     window->setWindowTitle("GORN Mods Installer");
     window->setWindowIcon(QIcon(":/icon.png"));
 
-    // Buttons
-    auto save_button = new QPushButton("Save");
-    auto render_button = new QPushButton("Render");
-
     // Image
 
-    // Custom widgets
-//    writeToRegistry();
-    auto platform_selection = new PlatformSelection();
 
     // Layouts
     auto main_layout = new QHBoxLayout;
-    auto config_layout = new QVBoxLayout;
 
-    config_layout->addWidget(platform_selection);
-    config_layout->addWidget(render_button);
-    config_layout->addWidget(save_button);
+    // @Todo find more elegant (eleganter?) way to handle this
+    if (getPlatform() == GamePlatform::None) {
+        auto platform_selection = new PlatformSelection();
+        main_layout->addWidget(platform_selection);
 
-    main_layout->addLayout(config_layout);
+        window->connect(platform_selection, &PlatformSelection::platformSelected, [&](GamePlatform selection){
+            savePlatform(selection);
+        });
+    } else {
+        auto platform_selection = new QLabel("Platform is :" + QString::number(getPlatform()));
+        main_layout->addWidget(platform_selection);
+    }
 
     window->setLayout(main_layout);
-
-    // Connect
-    window->connect(render_button, &QPushButton::pressed, [&]{
-        std::cout << "Hello 1" << std::endl;
-    });
-
-    window->connect(save_button, &QPushButton::pressed, [&]{
-        std::cout << "Hello 2" << std::endl;
-    });
 
     window->show();
 
