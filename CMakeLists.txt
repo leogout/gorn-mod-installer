@@ -19,5 +19,3 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${RESOURCE_FILES})
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 
 target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets)
-
-

@@ -5,6 +5,16 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QApplication>
+#include <QtCore/QFile>
+
+void createSaveFile() {
+    QFile file("./save.gmi");
+    file.open(QIODevice::ReadWrite);
+
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_5_12);
+    out << "Hello";
+}
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -18,10 +28,9 @@ int main(int argc, char *argv[]) {
     auto render_button = new QPushButton("Render");
 
     // Image
-    auto image_zone = new QLabel;
 
     // Custom widgets
-
+    createSaveFile();
 
     // Layouts
     auto main_layout = new QHBoxLayout;
@@ -31,7 +40,6 @@ int main(int argc, char *argv[]) {
     config_layout->addWidget(save_button);
 
     main_layout->addLayout(config_layout);
-    main_layout->addWidget(image_zone);
 
     window->setLayout(main_layout);
 
