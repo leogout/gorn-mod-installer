@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(gorn_mod_intaller)
+project(gorn_mod_installer)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
