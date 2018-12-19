@@ -12,7 +12,7 @@ set(RESOURCE_FOLDER res)
 set(RESOURCE_FILES ${RESOURCE_FOLDER}/resources.qrc)
 
 set(SOURCE_FILES
-        src/main.cpp)
+        src/main.cpp src/view/PlatformSelection.cpp src/view/PlatformSelection.h)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${RESOURCE_FILES})
 

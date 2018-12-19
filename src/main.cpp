@@ -6,20 +6,20 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QApplication>
 #include <QtCore/QFile>
+#include <QtCore/QSettings>
+#include <src/view/PlatformSelection.h>
 
-void createSaveFile() {
-    QFile file("./save.gmi");
-    file.open(QIODevice::ReadWrite);
-
-    QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_5_12);
-    out << "Hello";
+void writeToRegistry() {
+    QSettings settings("Leogout", "Gorn Mods Installer");
+    settings.setValue("platform", "aaa");
+    std::cout << settings.value("zdzdz").toString().isNull();
 }
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     auto window = new QWidget;
+    window->setMinimumSize(400, 100);
     window->setWindowTitle("GORN Mods Installer");
     window->setWindowIcon(QIcon(":/icon.png"));
 
@@ -30,12 +30,14 @@ int main(int argc, char *argv[]) {
     // Image
 
     // Custom widgets
-    createSaveFile();
+//    writeToRegistry();
+    auto platform_selection = new PlatformSelection();
 
     // Layouts
     auto main_layout = new QHBoxLayout;
     auto config_layout = new QVBoxLayout;
 
+    config_layout->addWidget(platform_selection);
     config_layout->addWidget(render_button);
     config_layout->addWidget(save_button);
 
