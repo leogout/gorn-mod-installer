@@ -8,6 +8,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QSettings>
 #include <src/view/PlatformSelection.h>
+#include <QtCore/QDir>
+#include <QtWidgets/QErrorMessage>
+#include <QtWidgets/QMessageBox>
 
 PlatformConfig getPlatformConfig() {
     QSettings settings("Leogout", "Gorn Mods Installer");
@@ -52,14 +55,35 @@ int main(int argc, char *argv[]) {
         main_layout->addWidget(platform_selection);
 
         window->connect(platform_selection, &PlatformSelection::platformSelected, [&](PlatformConfig config){
+            QString destination_path = QDir(config.path).filePath("GORN_Data/Assembly-CSharp.dll");
+            QString backup_path = QDir(config.path).filePath("GORN_Data/Assembly-CSharp.backup.dll");
+
+            // Check if destination file exists
+            if (not QFile::exists(destination_path)) {
+                QMessageBox::critical(window, "Incorrect GORN path", "The file \"" + destination_path + "\" does not exist.");
+                return;
+            }
+
+            // Remove backup file if needed
+            if (QFile::exists(backup_path)) {
+                QMessageBox::StandardButton reply = QMessageBox::question(
+                        window,
+                        "Backup file already exists", "The file \"" + backup_path + "\" already exists, do you want to replace it ?",
+                        QMessageBox::Yes | QMessageBox::No);
+
+                if (reply == QMessageBox::Yes) {
+                    QFile::remove(backup_path);
+                }
+            }
+
+            // Copy is performed only if the file does not already exist
+            QFile::copy(destination_path, backup_path);
+            QFile::remove(destination_path);
+            QFile::copy(":/test.txt", destination_path);
+
             savePlatformConfig(config);
 
-            QString path = config.path;
-
-            // add trailing slash if missing
-            path += path.endsWith("/") or path.endsWith("\\") ? "test.txt" : "/test.txt";
-
-            QFile::copy(":/test.txt", path);
+            QMessageBox::information(window, "Success", "MemeLoader has been added to GORN successfully.");
         });
     } else {
         auto platform_selection = new QLabel("Game path is : " + config.path);
