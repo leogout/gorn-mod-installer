@@ -8,6 +8,11 @@
 
 enum GamePlatform { Steam, Oculus, None };
 
+struct PlatformPath {
+    GamePlatform platform;
+    QString path;
+};
+
 class PlatformSelection : public QWidget {
     Q_OBJECT
 public:
@@ -16,7 +21,9 @@ public:
 private:
     QComboBox* m_platform_input;
     QPushButton* m_platform_button;
-    QMap<QString, GamePlatform> m_platform_options;
+    QLineEdit* m_path_input;
+    QPushButton* m_path_button;
+    QMap<QString, PlatformPath> m_platform_options;
 signals:
     void platformSelected(GamePlatform platform);
 };

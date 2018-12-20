@@ -16,9 +16,14 @@ GamePlatform getPlatform() {
     return (GamePlatform) settings.value("platform", GamePlatform::None).toInt();
 }
 
-void savePlatform(GamePlatform platform) {
+void setPlatform(GamePlatform platform) {
     QSettings settings("Leogout", "Gorn Mods Installer");
     settings.setValue("platform", platform);
+}
+
+void unsetPlatform() {
+    QSettings settings("Leogout", "Gorn Mods Installer");
+    settings.remove("platform");
 }
 
 int main(int argc, char *argv[]) {
@@ -29,11 +34,10 @@ int main(int argc, char *argv[]) {
     window->setWindowTitle("GORN Mods Installer");
     window->setWindowIcon(QIcon(":/icon.png"));
 
-    // Image
-
-
     // Layouts
     auto main_layout = new QHBoxLayout;
+
+    unsetPlatform(); // <- for testing purposes, uncomment this
 
     // @Todo find more elegant (eleganter?) way to handle this
     if (getPlatform() == GamePlatform::None) {
@@ -41,7 +45,7 @@ int main(int argc, char *argv[]) {
         main_layout->addWidget(platform_selection);
 
         window->connect(platform_selection, &PlatformSelection::platformSelected, [&](GamePlatform selection){
-            savePlatform(selection);
+            setPlatform(selection);
         });
     } else {
         auto platform_selection = new QLabel("Platform is :" + QString::number(getPlatform()));
