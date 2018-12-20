@@ -20,7 +20,7 @@ PlatformConfig getPlatformConfig() {
     return config;
 }
 
-void setPlatformConfig(PlatformConfig config) {
+void savePlatformConfig(PlatformConfig config) {
     QSettings settings("Leogout", "Gorn Mods Installer");
     settings.setValue("config/platform", config.platform);
     settings.setValue("config/path", config.path);
@@ -52,11 +52,15 @@ int main(int argc, char *argv[]) {
         main_layout->addWidget(platform_selection);
 
         window->connect(platform_selection, &PlatformSelection::platformSelected, [&](PlatformConfig config){
-            setPlatformConfig(config);
+            savePlatformConfig(config);
+
+            QString path = config.path;
+
+            // add trailing slash if missing
+            path += path.endsWith("/") or path.endsWith("\\") ? "test.txt" : "/test.txt";
+
+            QFile::copy(":/test.txt", path);
         });
-
-
-
     } else {
         auto platform_selection = new QLabel("Game path is : " + config.path);
         main_layout->addWidget(platform_selection);
