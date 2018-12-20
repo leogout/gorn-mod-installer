@@ -6,10 +6,10 @@
 #include <QComboBox>
 #include <QPushButton>
 
-enum GamePlatform { Steam, Oculus, None };
+enum PlatformType { Steam, Oculus, None };
 
-struct PlatformPath {
-    GamePlatform platform;
+struct PlatformConfig {
+    PlatformType platform;
     QString path;
 };
 
@@ -23,9 +23,9 @@ private:
     QPushButton* m_platform_button;
     QLineEdit* m_path_input;
     QPushButton* m_path_button;
-    QMap<QString, PlatformPath> m_platform_options;
+    QMap<QString, PlatformConfig> m_platform_options;
 signals:
-    void platformSelected(GamePlatform platform);
+    void platformSelected(PlatformConfig platform);
 };
 
 

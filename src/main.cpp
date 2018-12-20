@@ -9,21 +9,27 @@
 #include <QtCore/QSettings>
 #include <src/view/PlatformSelection.h>
 
-GamePlatform getPlatform() {
+PlatformConfig getPlatformConfig() {
     QSettings settings("Leogout", "Gorn Mods Installer");
 
-    // If platform undefined in registry, returns GamePlatform::None
-    return (GamePlatform) settings.value("platform", GamePlatform::None).toInt();
+    PlatformConfig config {
+        (PlatformType) settings.value("config/platform", PlatformType::None).toInt(),
+        settings.value("config/path").toString(),
+    };
+
+    return config;
 }
 
-void setPlatform(GamePlatform platform) {
+void setPlatformConfig(PlatformConfig config) {
     QSettings settings("Leogout", "Gorn Mods Installer");
-    settings.setValue("platform", platform);
+    settings.setValue("config/platform", config.platform);
+    settings.setValue("config/path", config.path);
 }
 
 void unsetPlatform() {
     QSettings settings("Leogout", "Gorn Mods Installer");
-    settings.remove("platform");
+    settings.remove("config/platform");
+    settings.remove("config/path");
 }
 
 int main(int argc, char *argv[]) {
@@ -40,15 +46,19 @@ int main(int argc, char *argv[]) {
     unsetPlatform(); // <- for testing purposes, uncomment this
 
     // @Todo find more elegant (eleganter?) way to handle this
-    if (getPlatform() == GamePlatform::None) {
+    PlatformConfig config = getPlatformConfig();
+    if (config.platform == PlatformType::None) {
         auto platform_selection = new PlatformSelection();
         main_layout->addWidget(platform_selection);
 
-        window->connect(platform_selection, &PlatformSelection::platformSelected, [&](GamePlatform selection){
-            setPlatform(selection);
+        window->connect(platform_selection, &PlatformSelection::platformSelected, [&](PlatformConfig config){
+            setPlatformConfig(config);
         });
+
+
+
     } else {
-        auto platform_selection = new QLabel("Platform is :" + QString::number(getPlatform()));
+        auto platform_selection = new QLabel("Game path is : " + config.path);
         main_layout->addWidget(platform_selection);
     }
 
