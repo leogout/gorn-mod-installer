@@ -55,8 +55,11 @@ int main(int argc, char *argv[]) {
         main_layout->addWidget(platform_selection);
 
         window->connect(platform_selection, &PlatformSelection::platformSelected, [&](PlatformConfig config){
-            QString destination_path = QDir(config.path).filePath("GORN_Data/Assembly-CSharp.dll");
-            QString backup_path = QDir(config.path).filePath("GORN_Data/Assembly-CSharp.backup.dll");
+            QString destination_path = QDir(config.path).filePath("GORN_Data/Managed/Assembly-CSharp.dll");
+            QString backup_path = QDir(config.path).filePath("GORN_Data/Managed/Assembly-CSharp.backup.dll");
+            QString readme_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/README.txt");
+            QString uiobject_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/models/uiobject.asset");
+            QString loader_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/models/loader.meme");
 
             // Check if destination file exists
             if (not QFile::exists(destination_path)) {
@@ -66,20 +69,29 @@ int main(int argc, char *argv[]) {
 
             // Remove backup file if needed
             if (QFile::exists(backup_path)) {
-                QMessageBox::StandardButton reply = QMessageBox::question(
-                        window,
-                        "Backup file already exists", "The file \"" + backup_path + "\" already exists, do you want to replace it ?",
-                        QMessageBox::Yes | QMessageBox::No);
+                QMessageBox::StandardButton reply = (QMessageBox::StandardButton) QMessageBox::question(
+                    window,
+                    "Backup file already exists", "The file \"" + backup_path + "\" already exists, do you want to replace it ?",
+                    QMessageBox::Yes | QMessageBox::No);
 
                 if (reply == QMessageBox::Yes) {
                     QFile::remove(backup_path);
                 }
             }
 
-            // Copy is performed only if the file does not already exist
+            // Creates folders hierarchy
+            QDir(QDir(config.path).filePath("GORN_Data/mods/MemeLoader/models")).mkpath(".");
+
+            // Copy is performed only if the file does not already exist, no risk to replace the destination files
             QFile::copy(destination_path, backup_path);
             QFile::remove(destination_path);
-            QFile::copy(":/test.txt", destination_path);
+            QFile::copy(config.platform == PlatformType::Oculus ?
+                        ":/memeloader/oculus.dll" :
+                        ":/memeloader/steam.dll",
+                        destination_path);
+            QFile::copy(":/memeloader/README.txt", readme_path);
+            QFile::copy(":/memeloader/uiobject.asset", uiobject_path);
+            QFile::copy(":/memeloader/loader.meme", loader_path);
 
             savePlatformConfig(config);
 

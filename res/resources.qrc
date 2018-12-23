@@ -1,6 +1,10 @@
 <!DOCTYPE RCC><RCC version="1.0">
   <qresource>
     <file>icon.png</file>
-    <file>test.txt</file>
+    <file>memeloader/loader.meme</file>
+    <file>memeloader/uiobject.asset</file>
+    <file>memeloader/README.txt</file>
+    <file>memeloader/oculus.dll</file>
+    <file>memeloader/steam.dll</file>
   </qresource>
 </RCC>
