@@ -12,7 +12,7 @@ set(RESOURCE_FOLDER res)
 set(RESOURCE_FILES ${RESOURCE_FOLDER}/resources.qrc)
 
 set(SOURCE_FILES
-        src/main.cpp src/view/PlatformSelection.cpp src/view/PlatformSelection.h)
+        src/main.cpp src/view/PlatformSelection.cpp src/view/PlatformSelection.h src/MemeLoaderInstaller.cpp src/MemeLoaderInstaller.h src/Registry.cpp src/Registry.h)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${RESOURCE_FILES})
 

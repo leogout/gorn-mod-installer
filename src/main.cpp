@@ -11,29 +11,10 @@
 #include <QtCore/QDir>
 #include <QtWidgets/QErrorMessage>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QStackedWidget>
+#include "Registry.h"
+#include "MemeLoaderInstaller.h"
 
-PlatformConfig getPlatformConfig() {
-    QSettings settings("Leogout", "Gorn Mods Installer");
-
-    PlatformConfig config {
-        (PlatformType) settings.value("config/platform", PlatformType::None).toInt(),
-        settings.value("config/path").toString(),
-    };
-
-    return config;
-}
-
-void savePlatformConfig(PlatformConfig config) {
-    QSettings settings("Leogout", "Gorn Mods Installer");
-    settings.setValue("config/platform", config.platform);
-    settings.setValue("config/path", config.path);
-}
-
-void unsetPlatform() {
-    QSettings settings("Leogout", "Gorn Mods Installer");
-    settings.remove("config/platform");
-    settings.remove("config/path");
-}
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -46,62 +27,29 @@ int main(int argc, char *argv[]) {
     // Layouts
     auto main_layout = new QHBoxLayout;
 
-    unsetPlatform(); // <- for testing purposes, uncomment this
+    Registry::unsetPlatform(); // <- for testing purposes, uncomment this
 
-    // @Todo find more elegant (eleganter?) way to handle this
-    PlatformConfig config = getPlatformConfig();
+    PlatformConfig config = Registry::getPlatformConfig();
+
+    auto platform_selection = new PlatformSelection();
+    auto mods_installer = new QLabel("Game path is : " + config.path);
+
+    auto stacked_widget = new QStackedWidget;
+    stacked_widget->addWidget(mods_installer);
+    stacked_widget->addWidget(platform_selection);
+
+    window->connect(platform_selection, &PlatformSelection::platformSelected, [&](PlatformConfig config){
+        MemeLoaderInstaller::install(window, config);
+        stacked_widget->setCurrentWidget(mods_installer);
+    });
+
     if (config.platform == PlatformType::None) {
-        auto platform_selection = new PlatformSelection();
-        main_layout->addWidget(platform_selection);
-
-        window->connect(platform_selection, &PlatformSelection::platformSelected, [&](PlatformConfig config){
-            QString destination_path = QDir(config.path).filePath("GORN_Data/Managed/Assembly-CSharp.dll");
-            QString backup_path = QDir(config.path).filePath("GORN_Data/Managed/Assembly-CSharp.backup.dll");
-            QString readme_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/README.txt");
-            QString uiobject_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/models/uiobject.asset");
-            QString loader_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/models/loader.meme");
-
-            // Check if destination file exists
-            if (not QFile::exists(destination_path)) {
-                QMessageBox::critical(window, "Incorrect GORN path", "The file \"" + destination_path + "\" does not exist.");
-                return;
-            }
-
-            // Remove backup file if needed
-            if (QFile::exists(backup_path)) {
-                QMessageBox::StandardButton reply = (QMessageBox::StandardButton) QMessageBox::question(
-                    window,
-                    "Backup file already exists", "The file \"" + backup_path + "\" already exists, do you want to replace it ?",
-                    QMessageBox::Yes | QMessageBox::No);
-
-                if (reply == QMessageBox::Yes) {
-                    QFile::remove(backup_path);
-                }
-            }
-
-            // Creates folders hierarchy
-            QDir(QDir(config.path).filePath("GORN_Data/mods/MemeLoader/models")).mkpath(".");
-
-            // Copy is performed only if the file does not already exist, no risk to replace the destination files
-            QFile::copy(destination_path, backup_path);
-            QFile::remove(destination_path);
-            QFile::copy(config.platform == PlatformType::Oculus ?
-                        ":/memeloader/oculus.dll" :
-                        ":/memeloader/steam.dll",
-                        destination_path);
-            QFile::copy(":/memeloader/README.txt", readme_path);
-            QFile::copy(":/memeloader/uiobject.asset", uiobject_path);
-            QFile::copy(":/memeloader/loader.meme", loader_path);
-
-            savePlatformConfig(config);
-
-            QMessageBox::information(window, "Success", "MemeLoader has been added to GORN successfully.");
-        });
+        stacked_widget->setCurrentWidget(platform_selection);
     } else {
-        auto platform_selection = new QLabel("Game path is : " + config.path);
-        main_layout->addWidget(platform_selection);
+        stacked_widget->setCurrentWidget(mods_installer);
     }
 
+    main_layout->addWidget(stacked_widget);
     window->setLayout(main_layout);
 
     window->show();
