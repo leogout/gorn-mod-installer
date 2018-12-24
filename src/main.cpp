@@ -12,6 +12,10 @@
 #include <QtWidgets/QErrorMessage>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QStackedWidget>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 #include "Registry.h"
 #include "MemeLoaderInstaller.h"
 
@@ -27,7 +31,7 @@ int main(int argc, char *argv[]) {
     // Layouts
     auto main_layout = new QHBoxLayout;
 
-    Registry::unsetPlatform(); // <- for testing purposes, uncomment this
+    Registry::unsetPlatform(); // <- for testing purposes
 
     PlatformConfig config = Registry::getPlatformConfig();
 
@@ -50,9 +54,28 @@ int main(int argc, char *argv[]) {
     }
 
     main_layout->addWidget(stacked_widget);
+
+
+    auto networkManager = new QNetworkAccessManager(window);
+
+    networkManager->get(QNetworkRequest(QUrl("https://api.github.com/repos/leogout/gorn-mod-installer/contents/.gitignore")));
+
+    window->connect(networkManager, SIGNAL(finished(QNetworkReply*)), window, SLOT(onResult(QNetworkReply*)));
+
+
+    window->connect(networkManager, &QNetworkAccessManager::finished, window, [&](QNetworkReply* reply){
+        QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
+        QJsonObject rootObj = document.object();
+        std::cout << "getete" << std::endl;
+
+        std::cout << rootObj.keys()[0].toStdString() << std::endl;
+    });
+
     window->setLayout(main_layout);
 
     window->show();
 
     return app.exec();
 }
+
+
