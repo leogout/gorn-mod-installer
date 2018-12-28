@@ -17,6 +17,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
+#include <src/view/ModsMainWindow.h>
 #include "Registry.h"
 #include "MemeLoaderInstaller.h"
 
@@ -32,16 +33,16 @@ int main(int argc, char *argv[]) {
     // Layouts
     auto main_layout = new QHBoxLayout;
 
-    Registry::unsetPlatform(); // <- for testing purposes
+    // Registry::unsetPlatform(); // <- for testing purposes
 
     PlatformConfig config = Registry::getPlatformConfig();
 
     auto platform_selection = new PlatformSelection();
-    auto mods_installer = new QLabel("Game path is : " + config.path);
+    auto mods_installer = new ModsMainWindow();
 
     auto stacked_widget = new QStackedWidget;
-    stacked_widget->addWidget(mods_installer);
     stacked_widget->addWidget(platform_selection);
+    stacked_widget->addWidget(mods_installer);
 
     window->connect(platform_selection, &PlatformSelection::platformSelected, [&](PlatformConfig config){
         MemeLoaderInstaller::install(window, config);
@@ -56,20 +57,6 @@ int main(int argc, char *argv[]) {
     }
 
     main_layout->addWidget(stacked_widget);
-
-    auto networkManager = new QNetworkAccessManager(window);
-
-    networkManager->get(QNetworkRequest(QUrl("https://api.github.com/repos/leogout/gorn-mod-installer/contents/mods")));
-
-    window->connect(networkManager, &QNetworkAccessManager::finished, window, [&](QNetworkReply* reply){
-        QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
-        QJsonArray rootObj = document.array();
-        std::cout << "Parsing..." << std::endl;
-
-        for (auto obj: rootObj) {
-            std::cout << obj.toObject().value("_links").toObject().value("self").toString().toStdString() << std::endl;
-        }
-    });
 
     window->setLayout(main_layout);
 

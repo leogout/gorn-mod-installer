@@ -36,6 +36,7 @@ PlatformSelection::PlatformSelection() {
     });
 
     connect(m_path_button, &QPushButton::pressed, [&]{
+        // @todo do not empty m_path_input when the user closes the directory selection
         QString gorn_path = QFileDialog::getExistingDirectory(
                 this,
                 "Select GORN directory",
