@@ -16,6 +16,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 #include "Registry.h"
 #include "MemeLoaderInstaller.h"
 
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]) {
 
     window->connect(platform_selection, &PlatformSelection::platformSelected, [&](PlatformConfig config){
         MemeLoaderInstaller::install(window, config);
+        // @todo check if installation went OK
         stacked_widget->setCurrentWidget(mods_installer);
     });
 
@@ -55,20 +57,18 @@ int main(int argc, char *argv[]) {
 
     main_layout->addWidget(stacked_widget);
 
-
     auto networkManager = new QNetworkAccessManager(window);
 
-    networkManager->get(QNetworkRequest(QUrl("https://api.github.com/repos/leogout/gorn-mod-installer/contents/.gitignore")));
-
-    window->connect(networkManager, SIGNAL(finished(QNetworkReply*)), window, SLOT(onResult(QNetworkReply*)));
-
+    networkManager->get(QNetworkRequest(QUrl("https://api.github.com/repos/leogout/gorn-mod-installer/contents")));
 
     window->connect(networkManager, &QNetworkAccessManager::finished, window, [&](QNetworkReply* reply){
         QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
-        QJsonObject rootObj = document.object();
-        std::cout << "getete" << std::endl;
+        QJsonArray rootObj = document.array();
+        std::cout << "Parsing..." << std::endl;
 
-        std::cout << rootObj.keys()[0].toStdString() << std::endl;
+        for (auto obj: rootObj) {
+            std::cout << obj.toObject().value("_links").toObject().value("self").toString().toStdString() << std::endl;
+        }
     });
 
     window->setLayout(main_layout);
