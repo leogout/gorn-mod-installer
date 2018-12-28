@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 
     auto networkManager = new QNetworkAccessManager(window);
 
-    networkManager->get(QNetworkRequest(QUrl("https://api.github.com/repos/leogout/gorn-mod-installer/contents")));
+    networkManager->get(QNetworkRequest(QUrl("https://api.github.com/repos/leogout/gorn-mod-installer/contents/mods")));
 
     window->connect(networkManager, &QNetworkAccessManager::finished, window, [&](QNetworkReply* reply){
         QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
