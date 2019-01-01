@@ -5,6 +5,7 @@
 #ifndef GORN_MOD_INSTALLER_REGISTRY_H
 #define GORN_MOD_INSTALLER_REGISTRY_H
 
+#include "view/PlatformSelection.h"
 
 class Registry {
 public:

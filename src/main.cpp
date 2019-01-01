@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     } else {
         stacked_widget->setCurrentWidget(mods_installer);
     }
-
+    std::cout << Registry::getPlatformConfig().path.toStdString() << std::endl;
     main_layout->addWidget(stacked_widget);
 
     window->setLayout(main_layout);
