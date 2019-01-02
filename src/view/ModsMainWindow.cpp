@@ -31,7 +31,7 @@ ModsMainWindow::ModsMainWindow() {
     QNetworkReply* init_reply = m_network_manager->get(QNetworkRequest(QUrl("https://api.github.com/repos/leogout/gorn-mod-installer/contents/mods")));
 
     connect(init_reply, &QNetworkReply::finished, this, [&](){
-        auto *reply = (QNetworkReply*) QObject::sender();
+        auto *reply = dynamic_cast<QNetworkReply*>(QObject::sender());
 
         QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
         QJsonArray rootObj = document.array();
@@ -42,14 +42,12 @@ ModsMainWindow::ModsMainWindow() {
         // @todo delete reply (use ->deleteLater())
     });
 
-    auto m_download_map = new QMap<QNetworkReply*, QJsonObject>();
-
     connect(m_install_button, &QPushButton::pressed, [&]{
         QNetworkReply* install_reply = m_network_manager->get(QNetworkRequest(QUrl("https://api.github.com/repos/leogout/gorn-mod-installer/contents/mods/" + m_available_list_widget->currentItem()->text())));
 
         connect(install_reply, &QNetworkReply::finished, this, [&](){
             // @todo check for network errors
-            auto *reply = (QNetworkReply*) QObject::sender();
+            auto *reply = dynamic_cast<QNetworkReply*>(QObject::sender());
 
             QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
             QJsonArray rootObj = document.array();
@@ -64,7 +62,7 @@ ModsMainWindow::ModsMainWindow() {
                 connect(download_reply, &QNetworkReply::finished, this, [&, filename]() {
                     // @todo check for network errors
                     // @todo check for writing permission
-                    auto *r = (QNetworkReply *) QObject::sender();
+                    auto *r = dynamic_cast<QNetworkReply*>(QObject::sender());
 
                     QString mods_path = QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods");
 

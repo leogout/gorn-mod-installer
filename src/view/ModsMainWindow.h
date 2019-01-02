@@ -17,7 +17,6 @@ private:
     QListWidget *m_available_list_widget;
     QPushButton* m_install_button;
     QNetworkAccessManager* m_network_manager;
-    QMap<QNetworkReply *, QJsonObject> * m_download_map;
 };
 
 #endif //GORN_MOD_INSTALLER_MODSMAINWINDOW_H
