@@ -8,6 +8,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 #include <src/Registry.h>
+#include <src/DownloadManager.h>
 #include "ModsMainWindow.h"
 #include "PlatformSelection.h"
 
@@ -28,27 +29,20 @@ ModsMainWindow::ModsMainWindow() {
 
     setLayout(main_layout);
 
-    QNetworkReply* init_reply = m_network_manager->get(QNetworkRequest(QUrl("https://api.github.com/repos/leogout/gorn-mod-installer/contents/mods")));
-
-    connect(init_reply, &QNetworkReply::finished, this, [&](){
-        auto *reply = dynamic_cast<QNetworkReply*>(QObject::sender());
-
+    m_dm.get("https://api.github.com/repos/leogout/gorn-mod-installer/contents/mods", [&] (QNetworkReply* reply) {
+        qDebug() << "Initial download succeeded.";
         QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
         QJsonArray rootObj = document.array();
 
         for (auto obj: rootObj) {
             new QListWidgetItem(obj.toObject().value("name").toString(), m_available_list_widget);
         }
-        // @todo delete reply (use ->deleteLater())
     });
 
     connect(m_install_button, &QPushButton::pressed, [&]{
-        QNetworkReply* install_reply = m_network_manager->get(QNetworkRequest(QUrl("https://api.github.com/repos/leogout/gorn-mod-installer/contents/mods/" + m_available_list_widget->currentItem()->text())));
+        QString selection = m_available_list_widget->currentItem()->text();
 
-        connect(install_reply, &QNetworkReply::finished, this, [&](){
-            // @todo check for network errors
-            auto *reply = dynamic_cast<QNetworkReply*>(QObject::sender());
-
+        m_dm.get("https://api.github.com/repos/leogout/gorn-mod-installer/contents/mods/" + selection, [&] (QNetworkReply* reply) {
             QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
             QJsonArray rootObj = document.array();
 
@@ -56,13 +50,10 @@ ModsMainWindow::ModsMainWindow() {
                 // @todo check if it is a directory and recurse if it is
                 std::cout << obj.toObject().value("download_url").toString().toStdString() << std::endl;
                 QString filename = obj.toObject().value("name").toString();
-                QNetworkReply* download_reply = m_network_manager->get(QNetworkRequest(QUrl(obj.toObject().value("download_url").toString())));
 
-                // @todo find less nested solution to handle downloads
-                connect(download_reply, &QNetworkReply::finished, this, [&, filename]() {
+                m_dm.get(obj.toObject().value("download_url").toString(), [&] (QNetworkReply* reply) {
                     // @todo check for network errors
                     // @todo check for writing permission
-                    auto *r = dynamic_cast<QNetworkReply*>(QObject::sender());
 
                     QString mods_path = QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods");
 
@@ -70,13 +61,11 @@ ModsMainWindow::ModsMainWindow() {
 
                     // @todo check if open went well
                     file.open(QIODevice::WriteOnly);
-                    file.write(r->readAll());
+                    file.write(reply->readAll());
                     file.close();
                     // @todo delete reply (use ->deleteLater())
                 });
             }
-            // @todo delete reply (use ->deleteLater())
         });
-
     });
 }

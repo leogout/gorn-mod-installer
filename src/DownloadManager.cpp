@@ -3,6 +3,7 @@
 //
 
 #include <QtNetwork/QNetworkReply>
+#include <iostream>
 #include "DownloadManager.h"
 
 DownloadManager::DownloadManager() {

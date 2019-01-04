@@ -6,6 +6,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
+#include "src/DownloadManager.h"
 
 class ModsMainWindow : public QWidget {
     Q_OBJECT
@@ -17,6 +18,7 @@ private:
     QListWidget *m_available_list_widget;
     QPushButton* m_install_button;
     QNetworkAccessManager* m_network_manager;
+    DownloadManager m_dm;
 };
 
 #endif //GORN_MOD_INSTALLER_MODSMAINWINDOW_H
