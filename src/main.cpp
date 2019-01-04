@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     // Layouts
     auto main_layout = new QHBoxLayout;
 
-    // Registry::unsetPlatform(); // <- for testing purposes
+    Registry::unsetPlatform(); // <- for testing purposes
 
     PlatformConfig config = Registry::getPlatformConfig();
 

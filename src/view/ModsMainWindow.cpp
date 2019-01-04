@@ -77,7 +77,7 @@ void ModsMainWindow::recursiveDownload(QString url) {
 void ModsMainWindow::downloadAndSave(QString url, QString filepath) {
     m_dm.get(url, [filepath] (QNetworkReply* reply) {
         //QString mods_path = QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods");
-        QString mods_path = QDir("C:/Users/F78478/Documents/projects/gorn-mod-installer/cmake-build-debug").filePath("GORN_Data/mods");
+        QString mods_path = QDir("C:/Users/F78478/Documents/projects/gorn-mod-installer/cmake-build-debug").filePath("GORN/GORN_Data/mods");
         QString dest_path = QDir(mods_path).filePath(filepath);
         QFile file(QDir(mods_path).filePath(filepath));
 
