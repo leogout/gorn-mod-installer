@@ -20,7 +20,8 @@ private:
     QNetworkAccessManager* m_network_manager;
     DownloadManager m_dm;
 
-    void recursiveDownload(QString &url);
+    void recursiveDownload(QString url);
+    void downloadAndSave(QString url, QString filename);
 };
 
 #endif //GORN_MOD_INSTALLER_MODSMAINWINDOW_H

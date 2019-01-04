@@ -7,6 +7,7 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <src/Registry.h>
 #include <src/DownloadManager.h>
 #include "ModsMainWindow.h"
@@ -29,7 +30,7 @@ ModsMainWindow::ModsMainWindow() {
 
     setLayout(main_layout);
 
-    m_dm.get("https://api.github.com/repos/leogout/gorn-mod-installer/contents/mods", [&] (QNetworkReply* reply) {
+    m_dm.get("https://api.github.com/repos/leogout/gorn-mod-gallery/contents", [&] (QNetworkReply* reply) {
         qDebug() << "Initial download succeeded.";
         QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
         QJsonArray rootObj = document.array();
@@ -40,32 +41,52 @@ ModsMainWindow::ModsMainWindow() {
     });
 
     connect(m_install_button, &QPushButton::pressed, [&]{
-        QString url = "https://api.github.com/repos/leogout/gorn-mod-installer/contents/mods/" + m_available_list_widget->currentItem()->text();
+        QString url = "https://api.github.com/repos/leogout/gorn-mod-gallery/contents/" + m_available_list_widget->currentItem()->text();
         recursiveDownload(url);
     });
 }
 
-void ModsMainWindow::recursiveDownload(QString &url) {
-    m_dm.get(url, [&] (QNetworkReply* reply) {
-        QJsonArray rootObj = QJsonDocument::fromJson(reply->readAll()).array();
+void ModsMainWindow::recursiveDownload(QString url) {
+    m_dm.get(url, [this] (QNetworkReply* reply) {
+        qDebug() << "Received.";
+
+        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+//        std::cout << "content: " << doc.toJson().toStdString() << std::endl;
+
+        QJsonArray rootObj = doc.array();
 
         for (auto obj: rootObj) {
             // @todo check if it is a directory and recurse if it is
-            QString url = obj.toObject().value("download_url").toString();
+            QString download_url = obj.toObject().value("download_url").toString();
+            QString self_url = obj.toObject().value("_links").toObject().value("self").toString();
             QString type = obj.toObject().value("type").toString();
-            QString filename = obj.toObject().value("name").toString();
-
+            QString filepath = obj.toObject().value("path").toString();
             qDebug() << type;
+
+            if (type == "dir") {
+                qDebug() << "Directory, recursing...";
+                recursiveDownload(self_url);
+            } else if (type == "file") {
+                qDebug() << "File, downloading...";
+                downloadAndSave(download_url, filepath);
+            }
         }
     });
 }
 
-void saveFile(QString filename, QNetworkReply* reply) {
-    //QString mods_path = QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods");
-    QString mods_path = QDir("C:/Users/F78478/Documents/projects/gorn-mod-installer/cmake-build-debug").filePath("GORN_Data/mods");
-    QFile file(QDir(mods_path).filePath(filename));
-    // @todo check if open went well
-    file.open(QIODevice::WriteOnly);
-    file.write(reply->readAll());
-    file.close();
+void ModsMainWindow::downloadAndSave(QString url, QString filepath) {
+    m_dm.get(url, [filepath] (QNetworkReply* reply) {
+        //QString mods_path = QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods");
+        QString mods_path = QDir("C:/Users/F78478/Documents/projects/gorn-mod-installer/cmake-build-debug").filePath("GORN_Data/mods");
+        QString dest_path = QDir(mods_path).filePath(filepath);
+        QFile file(QDir(mods_path).filePath(filepath));
+
+        // creates directories if needed
+        QDir(QFileInfo(file).absoluteDir()).mkpath(".");
+
+        // @todo check if open went well
+        file.open(QIODevice::WriteOnly);
+        file.write(reply->readAll());
+        file.close();
+    });
 }
