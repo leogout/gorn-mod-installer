@@ -19,6 +19,8 @@ private:
     QPushButton* m_install_button;
     QNetworkAccessManager* m_network_manager;
     DownloadManager m_dm;
+
+    void recursiveDownload(QString &url);
 };
 
 #endif //GORN_MOD_INSTALLER_MODSMAINWINDOW_H
