@@ -18,9 +18,9 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <src/view/ModsMainWindow.h>
-#include "Registry.h"
+#include "utils/Registry.h"
 #include "MemeLoaderInstaller.h"
-#include "DownloadManager.h"
+#include "utils/Fetcher.h"
 
 
 int main(int argc, char *argv[]) {
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     // Layouts
     auto main_layout = new QHBoxLayout;
 
-    Registry::unsetPlatform(); // <- for testing purposes
+    //Registry::unsetPlatform(); // <- for testing purposes
 
     PlatformConfig config = Registry::getPlatformConfig();
 

@@ -1,13 +1,9 @@
-//
-// Created by leogout on 12/23/2018.
-//
-
 #include <QtCore/QString>
 #include <QtCore/QDir>
 #include <QtWidgets/QMessageBox>
 #include <src/view/PlatformSelection.h>
 #include "MemeLoaderInstaller.h"
-#include "Registry.h"
+#include "utils/Registry.h"
 
 void MemeLoaderInstaller::install(QWidget* parent, PlatformConfig config) {
     QString destination_path = QDir(config.path).filePath("GORN_Data/Managed/Assembly-CSharp.dll");

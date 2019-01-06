@@ -1,7 +1,3 @@
-//
-// Created by leogout on 12/23/2018.
-//
-
 #include <src/view/PlatformSelection.h>
 #include <QtCore/QSettings>
 #include "Registry.h"
