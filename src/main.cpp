@@ -17,7 +17,8 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
-#include <src/view/ModsMainWindow.h>
+#include <src/view/ModsSelection.h>
+#include <src/view/MainWindow.h>
 #include "utils/Registry.h"
 #include "MemeLoaderInstaller.h"
 #include "utils/Fetcher.h"
@@ -26,42 +27,8 @@
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
-    auto window = new QWidget;
-    window->setMinimumSize(400, 100);
-    window->setWindowTitle("GORN Mods Installer");
-    window->setWindowIcon(QIcon(":/icon.png"));
-
-    // Layouts
-    auto main_layout = new QHBoxLayout;
-
-    //Registry::unsetPlatform(); // <- for testing purposes
-
-    PlatformConfig config = Registry::getPlatformConfig();
-
-    auto platform_selection = new PlatformSelection();
-    auto mods_installer = new ModsMainWindow();
-
-    auto stacked_widget = new QStackedWidget;
-    stacked_widget->addWidget(platform_selection);
-    stacked_widget->addWidget(mods_installer);
-
-    window->connect(platform_selection, &PlatformSelection::platformSelected, [&](PlatformConfig config){
-        MemeLoaderInstaller::install(window, config);
-        // @todo check if installation went OK
-        stacked_widget->setCurrentWidget(mods_installer);
-    });
-
-    if (config.platform == PlatformType::None) {
-        stacked_widget->setCurrentWidget(platform_selection);
-    } else {
-        stacked_widget->setCurrentWidget(mods_installer);
-    }
-
-    main_layout->addWidget(stacked_widget);
-
-    window->setLayout(main_layout);
-
-    window->show();
+    auto main_window = new MainWindow();
+    main_window->show();
 
     return app.exec();
 }

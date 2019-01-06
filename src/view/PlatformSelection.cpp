@@ -44,7 +44,10 @@ PlatformSelection::PlatformSelection() {
                 QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
         // @Todo add validator to check the correctness of the directory based on its content.
-        // @Todo May contain different things depending on the platform (oculus vs steam).
+        if (gorn_path.isEmpty()) {
+            return;
+        }
+        
         m_path_input->setText(gorn_path);
     });
 

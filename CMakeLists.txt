@@ -13,7 +13,7 @@ SET(GUI_TYPE WIN32)
 set(RESOURCE_FOLDER res)
 set(RESOURCE_FILES ${RESOURCE_FOLDER}/resources.qrc)
 
-set(SOURCE_FILES src/main.cpp src/view/PlatformSelection.cpp src/view/PlatformSelection.h src/MemeLoaderInstaller.cpp src/MemeLoaderInstaller.h src/utils/Registry.cpp src/utils/Registry.h src/view/ModsMainWindow.cpp src/view/ModsMainWindow.h src/utils/Fetcher.cpp src/utils/Fetcher.h src/utils/ModApi.cpp src/utils/ModApi.h)
+set(SOURCE_FILES src/main.cpp src/view/PlatformSelection.cpp src/view/PlatformSelection.h src/MemeLoaderInstaller.cpp src/MemeLoaderInstaller.h src/utils/Registry.cpp src/utils/Registry.h src/view/ModsSelection.cpp src/view/ModsSelection.h src/utils/Fetcher.cpp src/utils/Fetcher.h src/utils/ModApi.cpp src/utils/ModApi.h src/view/MainWindow.cpp src/view/MainWindow.h)
 
 if(CMAKE_BUILD_TYPE STREQUAL Release)
     add_executable(${PROJECT_NAME} ${GUI_TYPE} ${SOURCE_FILES} ${RESOURCE_FILES})

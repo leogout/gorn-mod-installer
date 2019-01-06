@@ -14,8 +14,8 @@
  * @param mod
  * @param destination
  */
-void ModApi::download(QString &mod, QString &destination) {
-    m_fetcher.get(m_baseurl + mod, [this] (QNetworkReply* reply) {
+void ModApi::download(QString &mod, QString destination) {
+    m_fetcher.get(m_baseurl + mod, [this, destination] (QNetworkReply* reply) {
         qDebug() << "Received.";
         QJsonArray rootObj = QJsonDocument::fromJson(reply->readAll()).array();
 
@@ -36,8 +36,8 @@ void ModApi::download(QString &mod, QString &destination) {
     });
 }
 
-void ModApi::downloadAndSave(QString &relative_path, QString &destination) {
-    m_fetcher.get(m_baseurl + relative_path, [relative_path] (QNetworkReply* reply) {
+void ModApi::downloadAndSave(QString relative_path, QString destination) {
+    m_fetcher.get(m_baseurl + relative_path, [relative_path, destination] (QNetworkReply* reply) {
         QString dest_path = QDir(destination).filePath(relative_path);
         QFile file(QDir(destination).filePath(relative_path));
 

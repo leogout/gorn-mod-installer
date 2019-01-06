@@ -8,9 +8,9 @@
 class ModApi {
     Fetcher m_fetcher;
     const QString m_baseurl = "https://api.github.com/repos/leogout/gorn-mod-gallery/contents";
-    void downloadAndSave(QString &mod, QString &destination);
+    void downloadAndSave(QString mod, QString destination);
 public:
-    void download(QString &mod, QString &destination);
+    void download(QString &mod, QString destination);
     void list(std::function<void(std::vector<QString>)> callback);
 };
 

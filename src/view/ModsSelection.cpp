@@ -10,10 +10,10 @@
 #include <QtCore/QFileInfo>
 #include <src/utils/Registry.h>
 #include <src/utils/Fetcher.h>
-#include "ModsMainWindow.h"
+#include "ModsSelection.h"
 #include "PlatformSelection.h"
 
-ModsMainWindow::ModsMainWindow() {
+ModsSelection::ModsSelection() {
     auto main_layout = new QVBoxLayout();
     auto lists_layout = new QHBoxLayout();
 

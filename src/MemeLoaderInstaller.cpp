@@ -12,6 +12,8 @@ void MemeLoaderInstaller::install(QWidget* parent, PlatformConfig config) {
     QString uiobject_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/models/uiobject.asset");
     QString loader_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/models/loader.meme");
 
+
+
     // @todo check for writing permission
     // @todo download MemeLoader from github directly
     // Check if destination file exists

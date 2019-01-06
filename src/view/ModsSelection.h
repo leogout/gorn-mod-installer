@@ -9,10 +9,10 @@
 #include <src/utils/ModApi.h>
 #include "src/utils/Fetcher.h"
 
-class ModsMainWindow : public QWidget {
-    Q_OBJECT
+class ModsSelection : public QWidget {
+Q_OBJECT
 public:
-    explicit ModsMainWindow();
+    explicit ModsSelection();
 private:
     ModApi m_api;
     QListWidget* m_installed_list_widget;
