@@ -15,6 +15,7 @@
  * @param destination
  */
 void ModManager::download(QString &mod, QString destination) {
+    // @todo separate files discovery and download
     m_fetcher.get(m_baseurl + mod, [this, destination] (QNetworkReply* reply) {
         qDebug() << "Received.";
         QJsonArray rootObj = QJsonDocument::fromJson(reply->readAll()).array();
@@ -42,7 +43,7 @@ void ModManager::download(QString &mod, QString destination) {
  * @param destination
  */
 void ModManager::downloadAndSave(QString relative_path, QString destination) {
-    m_fetcher.get(m_baseurl + relative_path, [relative_path, destination] (QNetworkReply* reply) {
+    m_fetcher.get(m_baseurl + relative_path, [this, relative_path, destination] (QNetworkReply* reply) {
         QString dest_path = QDir(destination).filePath(relative_path);
         QFile file(QDir(destination).filePath(relative_path));
 
@@ -53,7 +54,22 @@ void ModManager::downloadAndSave(QString relative_path, QString destination) {
         file.open(QIODevice::WriteOnly);
         file.write(reply->readAll());
         file.close();
+        qDebug() << "Installed";
+        emit installed();
     });
+}
+
+void ModManager::remove(QString &mod) {
+    qDebug() << mod;
+
+    QString mod_path = QDir(QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods")).filePath(mod);
+    QDir dir(mod_path);
+
+    qDebug() << mod_path;
+
+    dir.removeRecursively();
+
+    emit removed();
 }
 
 /**

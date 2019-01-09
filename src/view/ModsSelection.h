@@ -13,6 +13,7 @@ class ModsSelection : public QWidget {
     ModManager* m_mod_manager;
     QListWidget* m_installed_list_widget;
     QListWidget* m_available_list_widget;
+    QPushButton* m_remove_button;
     QPushButton* m_install_button;
     void showEvent(QShowEvent *event) override;
 public:

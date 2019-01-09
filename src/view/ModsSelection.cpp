@@ -15,36 +15,55 @@
 ModsSelection::ModsSelection() {
     auto main_layout = new QVBoxLayout;
     auto lists_layout = new QHBoxLayout;
+    auto buttons_layout = new QHBoxLayout;
 
     m_mod_manager = new ModManager;
     m_installed_list_widget = new QListWidget;
     m_available_list_widget = new QListWidget;
+    m_remove_button = new QPushButton("Remove");
     m_install_button = new QPushButton("Install");
 
     lists_layout->addWidget(m_installed_list_widget);
     lists_layout->addWidget(m_available_list_widget);
+    buttons_layout->addWidget(m_remove_button);
+    buttons_layout->addWidget(m_install_button);
     main_layout->addLayout(lists_layout);
-    main_layout->addWidget(m_install_button);
+    main_layout->addLayout(buttons_layout);
 
     setLayout(main_layout);
 
     connect(m_mod_manager, &ModManager::availableListed, [this] (QStringList list) {
+        m_available_list_widget->clear();
         for (auto &mod: list) {
             new QListWidgetItem(mod, m_available_list_widget);
         }
     });
 
     connect(m_mod_manager, &ModManager::installedListed, [this] (QStringList list) {
+        m_installed_list_widget->clear();
         for (auto &mod: list) {
             new QListWidgetItem(mod, m_installed_list_widget);
         }
+    });
+
+    connect(m_mod_manager, &ModManager::installed, [this] {
+        m_mod_manager->listInstalled(); // called to update the list of installed mods
+    });
+
+    connect(m_mod_manager, &ModManager::removed, [this] {
+        m_mod_manager->listInstalled(); // called to update the list of installed mods
+    });
+
+    connect(m_remove_button, &QPushButton::pressed, [this]{
+        QString mod = m_installed_list_widget->currentItem()->text();
+        qDebug() << mod;
+        m_mod_manager->remove(mod);
     });
 
     connect(m_install_button, &QPushButton::pressed, [this]{
         QString mod = m_available_list_widget->currentItem()->text();
         QString destination = QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods");
         m_mod_manager->download(mod, destination);
-        m_mod_manager->listInstalled(); // called to update the list of installed mods
     });
 }
 
@@ -58,7 +77,6 @@ void ModsSelection::showEvent(QShowEvent *event) {
 
     m_mod_manager->listAvailable();
     m_mod_manager->listInstalled();
-
 
     qDebug() << "done";
 }

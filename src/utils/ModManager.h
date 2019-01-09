@@ -15,9 +15,12 @@ public:
     void download(QString &mod, QString destination);
     void listAvailable();
     void listInstalled();
+    void remove(QString &mod);
 signals:
     void availableListed(QStringList list);
     void installedListed(QStringList list);
+    void installed();
+    void removed();
 };
 
 #endif //GORN_MOD_INSTALLER_MODDOWNLOADER_H
