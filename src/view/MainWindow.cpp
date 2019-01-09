@@ -12,29 +12,28 @@
 
 MainWindow::MainWindow() {
     //Registry::unsetPlatform(); // <- for testing purposes
+    auto platform_selection = new PlatformSelection;
+    auto mods_selection = new ModsSelection;
+    auto main_layout = new QHBoxLayout;
+    auto stacked_widget = new QStackedWidget;
 
-    m_platform_selection = new PlatformSelection();
-    m_mods_selection = new ModsSelection();
-
-    m_stacked_widget = new QStackedWidget;
-    m_stacked_widget->addWidget(m_platform_selection);
-    m_stacked_widget->addWidget(m_mods_selection);
+    stacked_widget->addWidget(platform_selection);
+    stacked_widget->addWidget(mods_selection);
 
     PlatformConfig config = Registry::getPlatformConfig();
     if (config.platform == PlatformType::None) {
-        m_stacked_widget->setCurrentWidget(m_platform_selection);
+        stacked_widget->setCurrentWidget(platform_selection);
     } else {
-        m_stacked_widget->setCurrentWidget(m_mods_selection);
+        stacked_widget->setCurrentWidget(mods_selection);
     }
 
-    connect(m_platform_selection, &PlatformSelection::platformSelected, [this](PlatformConfig config){
+    connect(platform_selection, &PlatformSelection::platformSelected, [this, stacked_widget, mods_selection](PlatformConfig config){
         MemeLoaderInstaller::install(this, config);
         // @todo check if installation went OK
-        m_stacked_widget->setCurrentWidget(m_mods_selection);
+        stacked_widget->setCurrentWidget(mods_selection);
     });
 
-    auto main_layout = new QHBoxLayout;
-    main_layout->addWidget(m_stacked_widget);
+    main_layout->addWidget(stacked_widget);
 
     setMinimumSize(400, 100);
     setWindowTitle("GORN Mods Installer");

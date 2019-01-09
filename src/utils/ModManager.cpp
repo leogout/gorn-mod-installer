@@ -6,7 +6,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QNetworkReply>
-#include "ModApi.h"
+#include "ModManager.h"
 
 /**
  * Downloads one file at a time for a given mod, recurse if it encounters a folder
@@ -14,7 +14,7 @@
  * @param mod
  * @param destination
  */
-void ModApi::download(QString &mod, QString destination) {
+void ModManager::download(QString &mod, QString destination) {
     m_fetcher.get(m_baseurl + mod, [this, destination] (QNetworkReply* reply) {
         qDebug() << "Received.";
         QJsonArray rootObj = QJsonDocument::fromJson(reply->readAll()).array();
@@ -36,7 +36,12 @@ void ModApi::download(QString &mod, QString destination) {
     });
 }
 
-void ModApi::downloadAndSave(QString relative_path, QString destination) {
+/**
+ * Downloads what lies behind a target url to GORN mods directory + file relative path. Creates directories if needed.
+ * @param relative_path
+ * @param destination
+ */
+void ModManager::downloadAndSave(QString relative_path, QString destination) {
     m_fetcher.get(m_baseurl + relative_path, [relative_path, destination] (QNetworkReply* reply) {
         QString dest_path = QDir(destination).filePath(relative_path);
         QFile file(QDir(destination).filePath(relative_path));
@@ -51,17 +56,28 @@ void ModApi::downloadAndSave(QString relative_path, QString destination) {
     });
 }
 
-void ModApi::list(std::function<void(std::vector<QString>)> callback) {
-    m_fetcher.get(m_baseurl, [callback] (QNetworkReply* reply) {
+/**
+ * Lists all the mods available in github's repository
+ */
+void ModManager::listAvailable() {
+    m_fetcher.get(m_baseurl, [this] (QNetworkReply* reply) {
         QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
         QJsonArray root = document.array();
-        std::vector<QString> list;
+        QStringList list;
         for (auto obj: root) {
             list.push_back(obj.toObject().value("name").toString());
         }
-
-        callback(list);
+        emit availableListed(list);
     });
+}
+
+void ModManager::listInstalled() {
+    std::vector<QString> files;
+
+    QDir mods_dir(QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods"));
+    QStringList list = mods_dir.entryList(QDir::AllEntries|QDir::NoDotAndDotDot);
+
+    emit installedListed(list);
 }
 
 

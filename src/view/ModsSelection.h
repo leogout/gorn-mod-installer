@@ -6,18 +6,19 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
-#include <src/utils/ModApi.h>
-#include "src/utils/Fetcher.h"
+#include "src/utils/ModManager.h"
 
 class ModsSelection : public QWidget {
-Q_OBJECT
-public:
-    explicit ModsSelection();
-private:
-    ModApi m_api;
+    Q_OBJECT
+    ModManager* m_mod_manager;
     QListWidget* m_installed_list_widget;
     QListWidget* m_available_list_widget;
     QPushButton* m_install_button;
+    void showEvent(QShowEvent *event) override;
+public:
+    explicit ModsSelection();
+private:
+
 };
 
 #endif //GORN_MOD_INSTALLER_MODSMAINWINDOW_H
