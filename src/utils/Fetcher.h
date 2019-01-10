@@ -12,6 +12,7 @@ class Fetcher : public QObject {
     QHash<int, QNetworkReply*> m_replies;
 public:
     void get(QString url, std::function<void(QNetworkReply *)>);
+    void getSync(QString url, std::function<void(QNetworkReply *)>);
 };
 
 #endif //GORN_MOD_INSTALLER_DOWNLOADMANAGER_H

@@ -1,5 +1,6 @@
 #include <QtNetwork/QNetworkReply>
 #include <iostream>
+#include <QtCore/QEventLoop>
 #include "Fetcher.h"
 
 void Fetcher::get(QString url, std::function<void(QNetworkReply *)> callback) {
@@ -14,6 +15,18 @@ void Fetcher::get(QString url, std::function<void(QNetworkReply *)> callback) {
 
         r->deleteLater();
     });
+}
+
+void Fetcher::getSync(QString url, std::function<void(QNetworkReply *)> callback) {
+    QNetworkReply *reply = m_nam.get(QNetworkRequest(QUrl(url)));
+
+    QEventLoop eventLoop;
+    connect(reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit);
+    eventLoop.exec();
+
+    callback(reply);
+
+    reply->deleteLater();
 }
 
 

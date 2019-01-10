@@ -16,8 +16,25 @@
  */
 void ModManager::download(QString &mod, QString destination) {
     // @todo separate files discovery and download
-    m_fetcher.get(m_baseurl + mod, [this, destination] (QNetworkReply* reply) {
-        qDebug() << "Received.";
+    QStringList list;
+
+    listFilesRecursively(mod, list);
+
+    for (auto &file : list) {
+        qInfo() << "Downloading " << file << "...";
+        downloadAndSave(file, destination);
+    }
+
+    qDebug() << "Installed.";
+    emit installed();
+}
+
+/**
+ * Creates a list of all the files to download in a given directory and puts them in "list" synchronously.
+ * @param directory
+ */
+void ModManager::listFilesRecursively(QString &directory, QStringList &list) {
+    m_fetcher.getSync(m_baseurl + directory, [this, &list] (QNetworkReply* reply) {
         QJsonArray rootObj = QJsonDocument::fromJson(reply->readAll()).array();
 
         for (auto obj: rootObj) {
@@ -26,10 +43,10 @@ void ModManager::download(QString &mod, QString destination) {
 
             if (type == "dir") {
                 qDebug() << "Directory found, recursing...";
-                download(relative_path, destination);
+                listFilesRecursively(relative_path, list);
             } else if (type == "file") {
-                qDebug() << "File found, downloading...";
-                downloadAndSave(relative_path, destination);
+                qDebug() << "File found, added to download list...";
+                list.push_back(relative_path);
             } else {
                 qDebug() << "Unknown type: " << type;
             }
@@ -43,7 +60,7 @@ void ModManager::download(QString &mod, QString destination) {
  * @param destination
  */
 void ModManager::downloadAndSave(QString relative_path, QString destination) {
-    m_fetcher.get(m_baseurl + relative_path, [this, relative_path, destination] (QNetworkReply* reply) {
+    m_fetcher.getSync(m_baseurl + relative_path, [this, relative_path, destination] (QNetworkReply* reply) {
         QString dest_path = QDir(destination).filePath(relative_path);
         QFile file(QDir(destination).filePath(relative_path));
 
@@ -54,14 +71,10 @@ void ModManager::downloadAndSave(QString relative_path, QString destination) {
         file.open(QIODevice::WriteOnly);
         file.write(reply->readAll());
         file.close();
-        qDebug() << "Installed";
-        emit installed();
     });
 }
 
 void ModManager::remove(QString &mod) {
-    qDebug() << mod;
-
     QString mod_path = QDir(QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods")).filePath(mod);
     QDir dir(mod_path);
 
