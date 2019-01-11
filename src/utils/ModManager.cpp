@@ -20,8 +20,9 @@ void ModManager::download(QString &mod, QString destination) {
 
     listFilesRecursively(mod, list);
 
+    int i = 1;
     for (auto &file : list) {
-        qInfo() << "Downloading " << file << "...";
+        qInfo() << "Downloading" << i++ << "/" << list.size() << file << "...";
         downloadAndSave(file, destination);
     }
 
@@ -78,7 +79,7 @@ void ModManager::remove(QString &mod) {
     QString mod_path = QDir(QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods")).filePath(mod);
     QDir dir(mod_path);
 
-    qDebug() << mod_path;
+    qDebug() << "Removing " << mod_path;
 
     dir.removeRecursively();
 
@@ -94,17 +95,24 @@ void ModManager::listAvailable() {
         QJsonArray root = document.array();
         QStringList list;
         for (auto obj: root) {
-            list.push_back(obj.toObject().value("name").toString());
+            QString mod_name = obj.toObject().value("name").toString();
+            if (not mod_name.contains("MemeLoader")) {
+                list.push_back(mod_name);
+            }
         }
         emit availableListed(list);
     });
 }
 
+/**
+ * Lists all the mods installed in user's directory
+ */
 void ModManager::listInstalled() {
     std::vector<QString> files;
 
     QDir mods_dir(QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods"));
-    QStringList list = mods_dir.entryList(QDir::AllEntries|QDir::NoDotAndDotDot);
+    QStringList list = mods_dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot);
+    list.removeOne("MemeLoader");
 
     emit installedListed(list);
 }
