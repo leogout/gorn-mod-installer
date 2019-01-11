@@ -20,6 +20,7 @@ public:
 signals:
     void availableListed(QStringList list);
     void installedListed(QStringList list);
+    void progress(QString file, int percentage);
     void installed();
     void removed();
 };

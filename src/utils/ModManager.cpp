@@ -20,10 +20,12 @@ void ModManager::download(QString &mod, QString destination) {
 
     listFilesRecursively(mod, list);
 
-    int i = 1;
+    double i = 0;
     for (auto &file : list) {
-        qInfo() << "Downloading" << i++ << "/" << list.size() << file << "...";
         downloadAndSave(file, destination);
+        i++;
+
+        progress(file, static_cast<int>((i / list.size()) * 100));
     }
 
     qDebug() << "Installed.";
