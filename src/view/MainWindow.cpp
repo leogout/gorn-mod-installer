@@ -1,7 +1,3 @@
-//
-// Created by leogout on 1/6/2019.
-//
-
 #include <QtWidgets/QHBoxLayout>
 #include <src/utils/Registry.h>
 #include <QtWidgets/QStackedWidget>
@@ -14,8 +10,14 @@ MainWindow::MainWindow() {
     //Registry::unsetPlatform(); // <- for testing purposes
     auto platform_selection = new PlatformSelection;
     auto mods_selection = new ModsSelection;
-    auto main_layout = new QHBoxLayout;
+    auto main_layout = new QVBoxLayout;
     auto stacked_widget = new QStackedWidget;
+    auto signature_label = new QLabel();
+    signature_label->setText("Author: <a href=\"https://github.com/leogout\">leogout</a>");
+    signature_label->setTextFormat(Qt::RichText);
+    signature_label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    signature_label->setOpenExternalLinks(true);
+    signature_label->setAlignment(Qt::AlignCenter);
 
     stacked_widget->addWidget(platform_selection);
     stacked_widget->addWidget(mods_selection);
@@ -28,12 +30,14 @@ MainWindow::MainWindow() {
     }
 
     connect(platform_selection, &PlatformSelection::platformSelected, [this, stacked_widget, mods_selection](PlatformConfig config){
-        MemeLoaderInstaller::install(this, config);
-        // @todo check if installation went OK
-        stacked_widget->setCurrentWidget(mods_selection);
+        bool ok = MemeLoaderInstaller::install(this, config);
+         if (ok) {
+             stacked_widget->setCurrentWidget(mods_selection);
+         }
     });
 
     main_layout->addWidget(stacked_widget);
+    main_layout->addWidget(signature_label);
 
     setMinimumSize(400, 100);
     setWindowTitle("GORN Mods Installer");

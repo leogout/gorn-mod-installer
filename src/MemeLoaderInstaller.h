@@ -3,7 +3,7 @@
 
 class MemeLoaderInstaller {
 public:
-    static void install(QWidget* parent, PlatformConfig config);
+    static bool install(QWidget* parent, PlatformConfig config);
 };
 
 

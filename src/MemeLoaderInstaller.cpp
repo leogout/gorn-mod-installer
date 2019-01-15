@@ -5,21 +5,19 @@
 #include "MemeLoaderInstaller.h"
 #include "utils/Registry.h"
 
-void MemeLoaderInstaller::install(QWidget* parent, PlatformConfig config) {
+bool MemeLoaderInstaller::install(QWidget* parent, PlatformConfig config) {
     QString destination_path = QDir(config.path).filePath("GORN_Data/Managed/Assembly-CSharp.dll");
     QString backup_path = QDir(config.path).filePath("GORN_Data/Managed/Assembly-CSharp.backup.dll");
     QString readme_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/README.txt");
     QString uiobject_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/models/uiobject.asset");
     QString loader_path = QDir(config.path).filePath("GORN_Data/mods/MemeLoader/models/loader.meme");
 
-
-
     // @todo check for writing permission
     // @todo download MemeLoader from github directly
     // Check if destination file exists
     if (not QFile::exists(destination_path)) {
         QMessageBox::critical(parent, "Incorrect GORN path", "The file \"" + destination_path + "\" does not exist.");
-        return;
+        return false;
     }
 
     // Remove backup file if needed
@@ -51,4 +49,6 @@ void MemeLoaderInstaller::install(QWidget* parent, PlatformConfig config) {
     Registry::savePlatformConfig(config);
 
     QMessageBox::information(parent, "Success", "MemeLoader has been added to GORN successfully.");
+
+    return true;
 }
