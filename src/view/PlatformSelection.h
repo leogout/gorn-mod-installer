@@ -15,6 +15,14 @@ struct PlatformConfig {
 
 class PlatformSelection : public QWidget {
     Q_OBJECT
+    QMap<QString, PlatformConfig> m_platform_options;
+    QComboBox* m_platform_input;
+    QLineEdit* m_path_input;
+    QPushButton* platform_button;
+    QPushButton* m_path_button;
+    void onPlatformSelected(const QString &text);
+    void onPathButtonPressed();
+    void onPlatformButtonPressed();
 signals:
     void platformSelected(PlatformConfig platform);
 public:

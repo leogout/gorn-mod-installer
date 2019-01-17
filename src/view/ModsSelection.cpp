@@ -43,57 +43,73 @@ ModsSelection::ModsSelection() {
 
     setLayout(main_layout);
 
-    connect(m_mod_manager, &ModManager::availableListed, [this] (QStringList list) {
-        m_available_list_widget->clear();
-        for (auto &mod: list) {
-            new QListWidgetItem(mod, m_available_list_widget);
-        }
-    });
+    connect(m_mod_manager, &ModManager::availableListed, this, &ModsSelection::onListAvailable);
+    connect(m_mod_manager, &ModManager::installedListed, this, &ModsSelection::onListInstalled);
 
-    connect(m_mod_manager, &ModManager::installedListed, [this] (QStringList list) {
-        m_installed_list_widget->clear();
-        for (auto &mod: list) {
-            new QListWidgetItem(mod, m_installed_list_widget);
-        }
-    });
+    connect(m_install_button, &QPushButton::pressed, this, &ModsSelection::onInstallPressed);
+    connect(m_remove_button, &QPushButton::pressed, this, &ModsSelection::onRemovePressed);
 
-    connect(m_mod_manager, &ModManager::removed, [this] {
-        m_mod_manager->listInstalled(); // called to update the list of installed mods
-        m_install_button->setEnabled(true);
-        m_remove_button->setEnabled(true);
-    });
+    connect(m_mod_manager, &ModManager::progress, this, &ModsSelection::onProgress);
+    connect(m_mod_manager, &ModManager::installed, this, &ModsSelection::onInstalled);
+    connect(m_mod_manager, &ModManager::removed, this, &ModsSelection::onRemoved);
+}
 
-    connect(m_mod_manager, &ModManager::progress, [this] (QString file, int percentage) {
-        m_install_label->setText(file);
-        m_install_progress->setValue(percentage);
-    });
+void ModsSelection::onListAvailable(QStringList list) {
+    m_available_list_widget->clear();
+    for (auto &mod: list) {
+        new QListWidgetItem(mod, m_available_list_widget);
+    }
+}
 
-    connect(m_remove_button, &QPushButton::pressed, [this]{
-        m_install_button->setDisabled(true);
-        m_remove_button->setDisabled(true);
-        QString mod = m_installed_list_widget->currentItem()->text();
-        m_mod_manager->remove(mod);
-    });
+void ModsSelection::onListInstalled(QStringList list) {
+    m_installed_list_widget->clear();
+    for (auto &mod: list) {
+        new QListWidgetItem(mod, m_installed_list_widget);
+    }
+}
 
-    connect(m_install_button, &QPushButton::pressed, [this]{
-        m_install_button->setDisabled(true);
-        m_remove_button->setDisabled(true);
-        m_install_label->setText("");
-        m_install_progress->setValue(0);
-        m_install_label->show();
-        m_install_progress->show();
-        QString mod = m_available_list_widget->currentItem()->text();
-        QString destination = QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods");
-        m_mod_manager->download(mod, destination);
-    });
+void ModsSelection::onRemoved() {
+    m_mod_manager->listInstalled(); // called to update the list of installed mods
+    enableButtons();
+}
 
-    connect(m_mod_manager, &ModManager::installed, [this] {
-        m_install_label->hide();
-        m_install_progress->hide();
-        m_mod_manager->listInstalled(); // called to update the list of installed mods
-        m_install_button->setEnabled(true);
-        m_remove_button->setEnabled(true);
-    });
+void ModsSelection::onInstalled() {
+    m_install_label->hide();
+    m_install_progress->hide();
+    m_mod_manager->listInstalled(); // called to update the list of installed mods
+    enableButtons();
+}
+
+void ModsSelection::onProgress(QString file, int percentage) {
+    m_install_label->setText(file);
+    m_install_progress->setValue(percentage);
+}
+
+void ModsSelection::onRemovePressed() {
+    disableButtons();
+    QString mod = m_installed_list_widget->currentItem()->text();
+    m_mod_manager->remove(mod);
+}
+
+void ModsSelection::onInstallPressed() {
+    disableButtons();
+    m_install_label->setText("");
+    m_install_progress->setValue(0);
+    m_install_label->show();
+    m_install_progress->show();
+    QString mod = m_available_list_widget->currentItem()->text();
+    QString destination = QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods");
+    m_mod_manager->download(mod, destination);
+}
+
+void ModsSelection::disableButtons() {
+    m_install_button->setDisabled(true);
+    m_remove_button->setDisabled(true);
+}
+
+void ModsSelection::enableButtons() {
+    m_install_button->setEnabled(true);
+    m_remove_button->setEnabled(true);
 }
 
 void ModsSelection::showEvent(QShowEvent *event) {

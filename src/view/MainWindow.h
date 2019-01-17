@@ -18,6 +18,10 @@
 // @todo reorganize public vs private
 class MainWindow : public QWidget {
 Q_OBJECT
+    QStackedWidget* m_stacked_widget;
+    PlatformSelection* m_platform_selection;
+    ModsSelection* m_mods_selection;
+    void onPlatformSelected(PlatformConfig config);
 public:
     explicit MainWindow(); 
 };

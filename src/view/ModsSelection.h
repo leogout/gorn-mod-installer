@@ -20,6 +20,15 @@ class ModsSelection : public QWidget {
     QPushButton* m_remove_button;
     QPushButton* m_install_button;
     void showEvent(QShowEvent *event) override;
+    void disableButtons();
+    void enableButtons();
+    void onListAvailable(QStringList list);
+    void onListInstalled(QStringList list);
+    void onRemoved();
+    void onInstalled();
+    void onProgress(QString file, int percentage);
+    void onRemovePressed();
+    void onInstallPressed();
 public:
     explicit ModsSelection();
 private:
