@@ -10,13 +10,13 @@ class ModManager : public QObject {
     Q_OBJECT
     Fetcher m_fetcher;
     const QString m_baseurl = "https://api.github.com/repos/leogout/gorn-mod-gallery/contents";
-    void listFilesRecursively(QString &root, QStringList &list);
+    void listFilesRecursively(QString root, QStringList &list);
     void downloadAndSave(QString mod, QString destination);
 public:
-    void download(QString &mod, QString destination);
+    void download(QString mod, QString destination);
     void listAvailable();
     void listInstalled();
-    void remove(QString &mod);
+    void remove(QString mod);
 signals:
     void availableListed(QStringList list);
     void installedListed(QStringList list);

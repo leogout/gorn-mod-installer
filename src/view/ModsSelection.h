@@ -30,7 +30,7 @@ class ModsSelection : public QWidget {
     void onRemovePressed();
     void onInstallPressed();
 public:
-    explicit ModsSelection();
+    explicit ModsSelection(ModManager* mod_manager);
 private:
 
 };

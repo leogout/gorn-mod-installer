@@ -12,13 +12,12 @@
 #include "ModsSelection.h"
 #include "PlatformSelection.h"
 
-ModsSelection::ModsSelection() {
+ModsSelection::ModsSelection(ModManager* mod_manager): m_mod_manager(mod_manager) {
     auto main_layout = new QVBoxLayout;
     auto lists_layout = new QHBoxLayout;
     auto progress_layout = new QVBoxLayout;
     auto buttons_layout = new QHBoxLayout;
 
-    m_mod_manager = new ModManager;
     m_installed_list_widget = new QListWidget;
     m_available_list_widget = new QListWidget;
     m_install_label = new QLabel;

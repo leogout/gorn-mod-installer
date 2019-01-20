@@ -14,7 +14,7 @@
  * @param mod
  * @param destination
  */
-void ModManager::download(QString &mod, QString destination) {
+void ModManager::download(QString mod, QString destination) {
     // @todo separate files discovery and download
     QStringList list;
 
@@ -36,7 +36,7 @@ void ModManager::download(QString &mod, QString destination) {
  * Creates a list of all the files to download in a given directory and puts them in "list" synchronously.
  * @param directory
  */
-void ModManager::listFilesRecursively(QString &directory, QStringList &list) {
+void ModManager::listFilesRecursively(QString directory, QStringList &list) {
     m_fetcher.getSync(m_baseurl + directory, [this, &list] (QNetworkReply* reply) {
         QJsonArray rootObj = QJsonDocument::fromJson(reply->readAll()).array();
 
@@ -77,7 +77,7 @@ void ModManager::downloadAndSave(QString relative_path, QString destination) {
     });
 }
 
-void ModManager::remove(QString &mod) {
+void ModManager::remove(QString mod) {
     QString mod_path = QDir(QDir(Registry::getPlatformConfig().path).filePath("GORN_Data/mods")).filePath(mod);
     QDir dir(mod_path);
 
@@ -118,5 +118,3 @@ void ModManager::listInstalled() {
 
     emit installedListed(list);
 }
-
-

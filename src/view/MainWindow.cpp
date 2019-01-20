@@ -7,10 +7,11 @@
 #include "ModsSelection.h"
 
 MainWindow::MainWindow() {
-    //Registry::unsetPlatform(); // <- for testing purposes
+    auto mod_manager = new ModManager;
+
     m_stacked_widget = new QStackedWidget;
-    m_platform_selection = new PlatformSelection;
-    m_mods_selection = new ModsSelection;
+    m_platform_selection = new PlatformSelection(mod_manager);
+    m_mods_selection = new ModsSelection(mod_manager);
 
     auto main_layout = new QVBoxLayout;
     auto signature_label = new QLabel();
@@ -20,12 +21,12 @@ MainWindow::MainWindow() {
     signature_label->setOpenExternalLinks(true);
     signature_label->setAlignment(Qt::AlignCenter);
 
-    m_stacked_widget->addWidget(m_platform_selection );
+    m_stacked_widget->addWidget(m_platform_selection);
     m_stacked_widget->addWidget(m_mods_selection);
 
     PlatformConfig config = Registry::getPlatformConfig();
     if (config.platform == PlatformType::None) {
-        m_stacked_widget->setCurrentWidget(m_platform_selection );
+        m_stacked_widget->setCurrentWidget(m_platform_selection);
     } else {
         m_stacked_widget->setCurrentWidget(m_mods_selection);
     }
@@ -41,9 +42,6 @@ MainWindow::MainWindow() {
     connect(m_platform_selection, &PlatformSelection::platformSelected, this, &MainWindow::onPlatformSelected);
 }
 
-void MainWindow::onPlatformSelected(PlatformConfig config) {
-    bool ok = MemeLoaderInstaller::install(this, config);
-    if (ok) {
-        m_stacked_widget->setCurrentWidget(m_mods_selection);
-    }
+void MainWindow::onPlatformSelected() {
+    m_stacked_widget->setCurrentWidget(m_mods_selection);
 }
