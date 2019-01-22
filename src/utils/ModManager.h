@@ -5,12 +5,14 @@
 #include <src/utils/Fetcher.h>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include "FileDownloader.h"
+#include "RepositoryApi.h"
 
 class ModManager : public QObject {
     Q_OBJECT
-    Fetcher m_fetcher;
-    const QString m_baseurl = "https://api.github.com/repos/leogout/gorn-mod-gallery/contents";
-    void listFilesRecursively(QString root, QStringList &list);
+    FileDownloader m_file_downloader;
+    RepositoryApi m_repository_api;
+
     void downloadAndSave(QString mod, QString destination);
 public:
     void download(QString mod, QString destination);
