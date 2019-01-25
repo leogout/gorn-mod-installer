@@ -7,7 +7,7 @@
 #include "ModsSelection.h"
 
 MainWindow::MainWindow() {
-    auto mod_manager = new ModManager;
+    auto mod_manager = new ModManager(this);
 
     m_stacked_widget = new QStackedWidget;
     m_platform_selection = new PlatformSelection(mod_manager);

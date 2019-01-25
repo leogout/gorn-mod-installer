@@ -8,7 +8,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <src/utils/Registry.h>
-#include <src/utils/Fetcher.h>
 #include "ModsSelection.h"
 #include "PlatformSelection.h"
 

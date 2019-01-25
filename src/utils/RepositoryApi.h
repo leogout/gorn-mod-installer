@@ -13,6 +13,7 @@ class RepositoryApi : public QObject {
     void listFilesRecursive(QString directory, QStringList &list, int depth);
 public:
     QStringList listFiles(QString directory, int depth=-1);
+    QString getRepositoryUrl();
     RepositoryApi(QObject *parent, const QString &m_baseurl);
 };
 

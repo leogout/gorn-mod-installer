@@ -8,7 +8,6 @@
 
 #include <QtCore/QTemporaryFile>
 #include <QtNetwork/QNetworkAccessManager>
-#include "Fetcher.h"
 
 class FileDownloader : public QObject {
     Q_OBJECT
@@ -17,6 +16,9 @@ class FileDownloader : public QObject {
 public:
     enum Error { NetworkError, FileSystemError };
     void download(QString url);
+
+    FileDownloader();
+    FileDownloader(QObject *parent);
 signals:
     void success(QTemporaryFile* file);
     void error(FileDownloader::Error err);

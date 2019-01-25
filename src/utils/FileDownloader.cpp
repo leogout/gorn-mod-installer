@@ -31,3 +31,7 @@ void FileDownloader::onDownloadFinished() {
 
     reply->deleteLater();
 }
+
+FileDownloader::FileDownloader(QObject *parent) : QObject(parent) {}
+
+FileDownloader::FileDownloader() = default;

@@ -39,9 +39,19 @@ void RepositoryApi::listFilesRecursive(QString directory, QStringList &list, int
     reply->deleteLater();
 }
 
-QStringList RepositoryApi::listFiles(QString directory, int depth=-1) {
+/**
+ * Creates a list of all the files to download in a given directory and puts them in "list" synchronously.
+ * @param directory
+ */
+QStringList RepositoryApi::listFiles(QString directory, int depth) {
     QStringList list;
     listFilesRecursive(directory, list, depth);
+
+    return list;
+}
+
+QString RepositoryApi::getRepositoryUrl() {
+    return m_baseurl;
 }
 
 RepositoryApi::RepositoryApi(QObject *parent, const QString &m_baseurl) : QObject(parent), m_baseurl(m_baseurl) {}
